@@ -80,7 +80,7 @@ export const contractDefinitions = {
         provider: 'ProsopoProvider',
         block_number: 'u32'
     },
-    ProviderMap: '{"AccountId":"Provider"}',
+    ProviderMap: '{"AccountId":"ProsopoProvider"}',
     ProsopoCaptchaData: {
         provider: 'AccountId',
         merkle_tree_root: 'Hash',

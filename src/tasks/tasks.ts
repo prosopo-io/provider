@@ -28,19 +28,20 @@ import {
     parseCaptchaSolutions
 } from '../captcha'
 import {
-    Captcha, CaptchaConfig, CaptchaData,
+    Captcha, CaptchaConfig,
     CaptchaSolution,
-    CaptchaSolutionCommitment,
+    ProsopoCaptchaSolutionCommitment,
     CaptchaSolutionResponse,
-    CaptchaStatus,
+    CaptchaStatusZod,
     CaptchaWithProof,
     ContractApiInterface,
-    Dapp,
     Database, DatasetRecord,
-    GovernanceStatus, Payee,
-    Provider,
-    RandomProvider,
-    ProsopoEnvironment
+    ProsopoEnvironment, ProsopoDapp
+    , CaptchaData,
+    Payee,
+    ProsopoProvider,
+    ProsopoRandomProvider,
+    GovernanceStatus
 } from '../types'
 import { ProsopoContractApi } from '../contract/interface'
 import { ERRORS } from '../errors'
@@ -117,24 +118,24 @@ export class Tasks {
         return await this.contractApi.contractCall('providerDisapprove', [captchaSolutionCommitmentId])
     }
 
-    async getRandomProvider (userAccount: string, at?: string | Uint8Array): Promise<RandomProvider> {
-        return await this.contractApi.contractCall('getRandomActiveProvider', [userAccount], undefined, at) as unknown as RandomProvider
+    async getRandomProvider (userAccount: string, at?: string | Uint8Array): Promise<ProsopoRandomProvider> {
+        return await this.contractApi.contractCall('getRandomActiveProvider', [userAccount], undefined, at) as unknown as ProsopoRandomProvider
     }
 
-    async getProviderDetails (accountId: string): Promise<Provider> {
-        return await this.contractApi.contractCall('getProviderDetails', [accountId]) as unknown as Provider
+    async getProviderDetails (accountId: string): Promise<ProsopoProvider> {
+        return await this.contractApi.contractCall('getProviderDetails', [accountId]) as unknown as ProsopoProvider
     }
 
-    async getDappDetails (accountId: string): Promise<Dapp> {
-        return await this.contractApi.contractCall('getDappDetails', [accountId]) as unknown as Dapp
+    async getDappDetails (accountId: string): Promise<ProsopoDapp> {
+        return await this.contractApi.contractCall('getDappDetails', [accountId]) as unknown as ProsopoDapp
     }
 
     async getCaptchaData (captchaDatasetId: string): Promise<CaptchaData> {
         return await this.contractApi.contractCall('getCaptchaData', [captchaDatasetId]) as unknown as CaptchaData
     }
 
-    async getCaptchaSolutionCommitment (solutionId: string): Promise<CaptchaSolutionCommitment> {
-        return await this.contractApi.contractCall('getCaptchaSolutionCommitment', [solutionId]) as unknown as CaptchaSolutionCommitment
+    async getCaptchaSolutionCommitment (solutionId: string): Promise<ProsopoCaptchaSolutionCommitment> {
+        return await this.contractApi.contractCall('getCaptchaSolutionCommitment', [solutionId]) as unknown as ProsopoCaptchaSolutionCommitment
     }
 
     async getProviderAccounts (): Promise<AnyJson> {
@@ -190,7 +191,8 @@ export class Tasks {
         const pendingRequest = await this.validateDappUserSolutionRequestIsPending(requestHash, userAccount, captchaIds)
 
         // Only do stuff if the commitment is Pending on chain and in local DB (avoid using Approved commitments twice)
-        if (pendingRequest && commitment.status === CaptchaStatus.Pending) {
+        // @ts-ignore
+        if (pendingRequest && commitment.status === CaptchaStatusZod.Pending) {
             await this.db.storeDappUserSolution(receivedCaptchas, commitmentId)
             if (compareCaptchaSolutions(receivedCaptchas, storedCaptchas)) {
                 await this.providerApprove(commitmentId)
@@ -208,7 +210,8 @@ export class Tasks {
      */
     async dappIsActive (dappAccount: string): Promise<boolean> {
         const dapp = await this.getDappDetails(dappAccount)
-        return dapp.status === GovernanceStatus.Active
+        // @ts-ignore
+        return dapp.status === 'Active'
     }
 
     /**
@@ -216,7 +219,8 @@ export class Tasks {
      */
     async providerIsActive (providerAccount: string): Promise<boolean> {
         const provider = await this.getProviderDetails(providerAccount)
-        return provider.status === GovernanceStatus.Active
+        // @ts-ignore
+        return provider.status === 'Active'
     }
 
     /**
@@ -237,7 +241,7 @@ export class Tasks {
      * @param {CaptchaSolution[]} captchaSolutions
      * @returns {Promise<{ tree: CaptchaMerkleTree, commitment: CaptchaSolutionCommitment, commitmentId: string }>}
      */
-    async buildTreeAndGetCommitment (captchaSolutions: CaptchaSolution[]): Promise<{ tree: CaptchaMerkleTree, commitment: CaptchaSolutionCommitment, commitmentId: string }> {
+    async buildTreeAndGetCommitment (captchaSolutions: CaptchaSolution[]): Promise<{ tree: CaptchaMerkleTree, commitment: ProsopoCaptchaSolutionCommitment, commitmentId: string }> {
         const tree = new CaptchaMerkleTree()
         const solutionsHashed = captchaSolutions.map((captcha) => computeCaptchaSolutionHash(captcha))
         tree.build(solutionsHashed)

@@ -15,12 +15,17 @@
 // along with provider.  If not, see <http://www.gnu.org/licenses/>.
 import { z } from 'zod'
 import { AccountId, Hash } from '@polkadot/types/interfaces'
+// import { CaptchaStatus } from '.'
 
 export enum CaptchaTypes { SelectAll = 'SelectAll'}
 
 export enum CaptchaItemTypes {Text = 'text', Image = 'image'}
 
 const CaptchaItemTypesZod = z.nativeEnum(CaptchaItemTypes)
+
+export const CaptchaStatusSchema = z.enum(['Pending', 'Approved', 'Disapproved'])
+export const CaptchaStatusZod = CaptchaStatusSchema.Values
+export type CaptchaStatusZod = z.infer<typeof CaptchaStatusSchema>;
 
 export type CaptchaWithoutId = {
     salt: string,
@@ -51,15 +56,15 @@ export interface DatasetWithIdsAndTree extends DatasetWithIds {
     tree: string[][]
 }
 
-export enum CaptchaStatus { Pending = 'Pending', Approved = 'Approved', Disapproved = 'Disapproved' }
+// export enum CaptchaStatus { Pending = 'Pending', Approved = 'Approved', Disapproved = 'Disapproved' }
 
-export interface CaptchaSolutionCommitment {
-    account: AccountId,
-    captchaDatasetId: Hash,
-    status: CaptchaStatus,
-    contract: AccountId,
-    provider: AccountId,
-}
+// export interface CaptchaSolutionCommitment {
+//     account: AccountId,
+//     captchaDatasetId: Hash,
+//     status: CaptchaStatus,
+//     contract: AccountId,
+//     provider: AccountId,
+// }
 
 export type CaptchaSolution = {
     captchaId: string
@@ -88,11 +93,11 @@ export const CaptchaWithIdSchema = z.object({
     solution: z.number().array().optional()
 })
 
-export const CaptchaWithIdAndSolutionSchema = z.object({
-    captchaId: z.string(),
-    salt: z.string(),
-    solution: z.number().array()
-})
+// export const CaptchaWithIdAndSolutionSchema = z.object({
+//     captchaId: z.string(),
+//     salt: z.string(),
+//     solution: z.number().array()
+// })
 
 export const CaptchaImageSchema = z.object({
     path: z.string(),
@@ -110,11 +115,11 @@ export const SelectAllCaptchaSchema = CaptchaSchema.extend({
     target: z.string()
 })
 
-export const SelectAllSolvedCaptchaSchema = CaptchaWithIdAndSolutionSchema.extend({
-    solution: z.number().array(),
-    items: z.union([z.array(CaptchaImageSchema), z.string().array()]),
-    target: z.string()
-})
+// export const SelectAllSolvedCaptchaSchema = CaptchaWithIdAndSolutionSchema.extend({
+//     solution: z.number().array(),
+//     items: z.union([z.array(CaptchaImageSchema), z.string().array()]),
+//     target: z.string()
+// })
 
 export const CaptchasSchema = z.array(SelectAllCaptchaSchema)
 
@@ -128,7 +133,7 @@ export const CaptchaSolution = z.object({
 
 export const CaptchaSolutionSchema = z.array(CaptchaSolution)
 
-export const CaptchasSolvedSchema = z.array(SelectAllSolvedCaptchaSchema)
+// export const CaptchasSolvedSchema = z.array(SelectAllSolvedCaptchaSchema)
 
 export const DatasetSchema = z.object({
     datasetId: z.string().optional(),

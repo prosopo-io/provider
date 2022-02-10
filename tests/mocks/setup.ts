@@ -20,6 +20,8 @@ import { CaptchaMerkleTree } from '../../src/merkle'
 import { computeCaptchaSolutionHash, convertCaptchaToCaptchaSolution } from '../../src/captcha'
 import { Hash } from '@polkadot/types/interfaces'
 import { TestAccount, TestDapp, TestProvider } from './accounts'
+import { PayeeSchema } from '../../src/types'
+import { Payee } from '../../src/types/contract/contract'
 
 export async function displayBalance (env, address, who) {
     const balance = await env.network.api.query.system.account(address)
@@ -50,8 +52,10 @@ export async function setupProvider (env, provider: TestProvider): Promise<Hash>
     await env.changeSigner(provider.mnemonic)
     const tasks = new Tasks(env)
     console.log('   - providerRegister')
+    // @ts-ignore
     await tasks.providerRegister(hexHash(provider.serviceOrigin), provider.fee, provider.payee, provider.address)
     console.log('   - providerStake')
+    // @ts-ignore
     await tasks.providerUpdate(hexHash(provider.serviceOrigin), provider.fee, provider.payee, provider.address, provider.stake)
     console.log('   - providerAddDataset')
     const datasetResult = await tasks.providerAddDataset(provider.datasetFile)

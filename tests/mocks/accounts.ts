@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with provider.  If not, see <http://www.gnu.org/licenses/>.
-import { Payee } from '../../src/types'
+import { Registry } from 'redspot/types'
+import { Payee } from '../../src/types/contract/contract'
 
 export interface TestAccount {
     mnemonic: string

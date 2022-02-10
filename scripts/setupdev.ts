@@ -17,9 +17,9 @@ import { Environment } from '../src/env'
 import yargs from 'yargs'
 import BN from 'bn.js'
 import { approveOrDisapproveCommitment, sendFunds, setupDapp, setupDappUser, setupProvider } from '../tests/mocks/setup'
-import { Payee } from '../src/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { TestAccount, TestDapp, TestProvider } from '../tests/mocks/accounts'
+import { Payee } from '../src/types/contract/contract'
 
 require('dotenv').config()
 

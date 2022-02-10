@@ -91,6 +91,7 @@ export class ProsopoDatabase implements Database {
             }))
 
             // create a bulk upsert operation and execute
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             await this.tables.captchas?.bulkWrite(captchaDocs.map((captchaDoc) => ({
                 updateOne: {
                     filter: { _id: captchaDoc.captchaId },

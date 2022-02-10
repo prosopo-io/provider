@@ -18,15 +18,16 @@ import { Tasks } from '../../src/tasks/tasks'
 import { MockEnvironment } from '../mocks/mockenv'
 import { CaptchaMerkleTree } from '../../src/merkle'
 import {
-    PROVIDER,
     DAPP_USER,
     DAPP,
     TestProvider,
-    TestDapp
+    TestDapp,
+    PROVIDER
 } from '../mocks/accounts'
 import { ERRORS } from '../../src/errors'
 import { SOLVED_CAPTCHAS, DATASET } from '../mocks/mockdb'
-import { CaptchaSolution, Payee, Provider } from '../../src/types'
+import { CaptchaSolution, ProsopoProvider } from '../../src/types'
+import { Payee } from '../../src/types/contract/contract'
 import {
     computeCaptchaSolutionHash,
     computePendingRequestHash
@@ -35,7 +36,6 @@ import { sendFunds, setupDapp, setupProvider } from '../mocks/setup'
 import { randomAsHex } from '@polkadot/util-crypto'
 import { AnyJson } from '@polkadot/types/types/codec'
 import { promiseQueue } from '../../src/util'
-import { BN } from '@polkadot/util'
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
@@ -116,7 +116,8 @@ describe('CONTRACT TASKS', () => {
             const result: AnyJson = await providerTasks.providerRegister(
                 provider.serviceOrigin as string,
                 provider.fee as number,
-                provider.payee as Payee,
+                // @ts-ignore
+                provider.payee,
                 provider.address as string
             )
             expect(result).to.be.an('array')
@@ -134,7 +135,8 @@ describe('CONTRACT TASKS', () => {
             const result: AnyJson = await providerTasks.providerUpdate(
                 provider.serviceOrigin as string,
                 provider.fee as number,
-                provider.payee as Payee,
+                // @ts-ignore
+                provider.payee,
                 provider.address as string,
                 value
             )
@@ -179,6 +181,7 @@ describe('CONTRACT TASKS', () => {
         await providerTasks.providerRegister(
             inactiveProvider.serviceOrigin,
             inactiveProvider.fee,
+            // @ts-ignore
             inactiveProvider.payee,
             inactiveProvider.address
         )
@@ -263,7 +266,7 @@ describe('CONTRACT TASKS', () => {
         await mockEnv.changeSigner(provider.mnemonic as string)
         const providerTasks = new Tasks(mockEnv)
         try {
-            const result: Provider = await providerTasks.getProviderDetails(
+            const result: ProsopoProvider = await providerTasks.getProviderDetails(
                 provider.address as string
             )
             expect(result).to.have.a.property('status')
@@ -688,12 +691,14 @@ describe('CONTRACT TASKS', () => {
                     await tasks.providerRegister(
                         provider.serviceOrigin,
                         provider.fee,
+                        // @ts-ignore
                         provider.payee,
                         provider.address
                     )
                     await tasks.providerUpdate(
                         provider.serviceOrigin,
                         provider.fee,
+                        // @ts-ignore
                         provider.payee,
                         provider.address,
                         1
@@ -712,6 +717,7 @@ describe('CONTRACT TASKS', () => {
         })
 
         const res = await tasks.getRandomProvider(dappUser.address)
+        // @ts-ignore
         const blockNumber = parseInt(res.block_number.replace(/,/g, ''))
         const valid = await tasks.validateProviderWasRandomlyChosen(dappUser.address, res.provider.captcha_dataset_id, blockNumber)
             .then(() => true).catch(() => false)
@@ -738,12 +744,14 @@ describe('CONTRACT TASKS', () => {
         await tasks.providerRegister(
             provider.serviceOrigin,
             provider.fee,
+            // @ts-ignore
             provider.payee,
             provider.address
         )
         await tasks.providerUpdate(
             provider.serviceOrigin,
             provider.fee,
+            // @ts-ignore
             provider.payee,
             provider.address,
             1
@@ -755,6 +763,7 @@ describe('CONTRACT TASKS', () => {
         await tasks.providerAddDataset(captchaFilePath)
 
         const res = await tasks.getRandomProvider(dappUser.address)
+        // @ts-ignore
         const blockNumber = parseInt(res.block_number.replace(/,/g, ''))
         const valid = await tasks.validateProviderWasRandomlyChosen(dappUser.address, '0x1dc833d14a257f21967feddafb3b3876b75b3fc9b0a2d071f29da9bfebc84f5a', blockNumber).then(() => true).catch(() => false)
         return expect(valid).to.be.false
