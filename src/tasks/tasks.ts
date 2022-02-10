@@ -28,20 +28,22 @@ import {
     parseCaptchaSolutions
 } from '../captcha'
 import {
-    Captcha, CaptchaConfig, CaptchaData,
+    Captcha, CaptchaConfig,
     CaptchaSolution,
     CaptchaSolutionCommitment,
     CaptchaSolutionResponse,
     CaptchaStatus,
     CaptchaWithProof,
     ContractApiInterface,
-    Dapp,
     Database, DatasetRecord,
-    GovernanceStatus, Payee,
-    Provider,
-    RandomProvider,
     ProsopoEnvironment
 } from '../types'
+import {
+    Dapp, CaptchaData,
+    Payee,
+    Provider,
+    RandomProvider
+} from '../interfaces'
 import { ProsopoContractApi } from '../contract/interface'
 import { ERRORS } from '../errors'
 import { CaptchaMerkleTree } from '../merkle'
@@ -208,7 +210,7 @@ export class Tasks {
      */
     async dappIsActive (dappAccount: string): Promise<boolean> {
         const dapp = await this.getDappDetails(dappAccount)
-        return dapp.status === GovernanceStatus.Active
+        return dapp.status.isActive
     }
 
     /**
@@ -216,7 +218,7 @@ export class Tasks {
      */
     async providerIsActive (providerAccount: string): Promise<boolean> {
         const provider = await this.getProviderDetails(providerAccount)
-        return provider.status === GovernanceStatus.Active
+        return provider.status.isActive
     }
 
     /**

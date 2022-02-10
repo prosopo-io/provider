@@ -18,7 +18,7 @@ import { Network, Signer } from 'redspot/types'
 import Contract from '@redspot/patract/contract'
 import { ERRORS } from '../../src/errors'
 import { network, patract } from 'redspot'
-import { contractDefinitions } from '../../src/contract/definitions'
+import { prosopo } from '../../src/interfaces/definitions'
 import { strict as assert } from 'assert'
 
 const { mnemonicGenerate } = require('@polkadot/util-crypto')
@@ -85,7 +85,7 @@ export class MockEnvironment implements ProsopoEnvironment {
             await this.db?.connect()
         }
 
-        this.network.registry.register(contractDefinitions)
+        this.network.registry.register(prosopo.types)
         assert(this.contract instanceof Contract)
     }
 

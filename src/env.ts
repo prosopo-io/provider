@@ -23,7 +23,7 @@ import { strict as assert } from 'assert'
 import { ZodError } from 'zod'
 import { ERRORS } from './errors'
 import { Database, ProsopoConfig, ProsopoConfigSchema, ProsopoEnvironment } from './types'
-import { contractDefinitions } from './contract/definitions'
+import { prosopo } from './interfaces/definitions'
 
 require('dotenv').config()
 
@@ -74,7 +74,7 @@ export class Environment implements ProsopoEnvironment {
         await this.importDatabase()
         await this.db?.connect()
         // redspot will do this if using `npx redspot` commands. do it here anyway in case using `yarn ts-node ...`
-        this.network.registry.register(contractDefinitions)
+        this.network.registry.register(prosopo.types)
         assert(this.contract instanceof Contract)
     }
 

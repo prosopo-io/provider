@@ -20,7 +20,7 @@ import '@redspot/gas-reporter'
 import '@redspot/watcher'
 import '@redspot/explorer'
 import '@redspot/decimals'
-import { contractDefinitions } from './src/contract/definitions'
+import { prosopo } from './src/interfaces/definitions'
 require('dotenv').config()
 
 export default {
@@ -38,7 +38,7 @@ export default {
             // Use this to contact a localhost version of substrate
             // endpoint: "ws://host.docker.internal:9944",
             gasLimit: '400000000000',
-            types: contractDefinitions,
+            types: prosopo.types,
             accounts: [
                 '//Alice',
                 '//Bob',

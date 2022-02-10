@@ -23,64 +23,64 @@ import { TypeDef } from '@polkadot/types-create/types'
 import { AnyJson } from '@polkadot/types/types/codec'
 import { z } from 'zod'
 
-export enum GovernanceStatus {
-    Active = 'Active',
-    Inactive = 'Inactive',
-    Deactivated = 'Deactivated'
-}
+// export enum GovernanceStatus {
+//     Active = 'Active',
+//     Inactive = 'Inactive',
+//     Deactivated = 'Deactivated'
+// }
 
-export const PayeeSchema = z.enum(['Provider', 'Dapp', 'None'])
-export const Payee = PayeeSchema.Values
-export type Payee = z.infer<typeof PayeeSchema>;
+// export const PayeeSchema = z.enum(['Provider', 'Dapp', 'None'])
+// export const Payee = PayeeSchema.Values
+// export type Payee = z.infer<typeof PayeeSchema>;
 
-export interface Provider {
-    status: GovernanceStatus,
-    balance: Balance,
-    fee: u32,
-    payee: Payee,
-    // rust name style, hence snake case
-    service_origin: Hash | string,
-    captcha_dataset_id: Hash | string,
-}
+// export interface Provider {
+//     status: GovernanceStatus,
+//     balance: Balance,
+//     fee: u32,
+//     payee: Payee,
+//     // rust name style, hence snake case
+//     service_origin: Hash | string,
+//     captcha_dataset_id: Hash | string,
+// }
 
-export interface RandomProvider {
-    provider: Provider,
-    block_number: string,
-}
+// export interface RandomProvider {
+//     provider: Provider,
+//     block_number: string,
+// }
 
-export interface Dapp {
-    status: GovernanceStatus,
-    balance: Balance,
-    owner: AccountId,
-    min_difficulty: u16,
-    client_origin: Hash,
-}
+// export interface Dapp {
+//     status: GovernanceStatus,
+//     balance: Balance,
+//     owner: AccountId,
+//     min_difficulty: u16,
+//     client_origin: Hash,
+// }
 
-export interface CaptchaData {
-    provider: AccountId,
-    merkle_tree_root: Hash,
-    captcha_type: u16
-}
+// export interface CaptchaData {
+//     provider: AccountId,
+//     merkle_tree_root: Hash,
+//     captcha_type: u16
+// }
 
-export interface ContractTxResponse {
-    args: string[],
-    event: {
-        args: [{
-            name: string,
-            type: {
-                info: number,
-                type: string
-            }
-        }, {
-            name: string,
-            type: TypeDef
-        }],
-        docs: [],
-        identifier: string,
-        index: number
-    },
-    name: string
-}
+// export interface ContractTxResponse {
+//     args: string[],
+//     event: {
+//         args: [{
+//             name: string,
+//             type: {
+//                 info: number,
+//                 type: string
+//             }
+//         }, {
+//             name: string,
+//             type: TypeDef
+//         }],
+//         docs: [],
+//         identifier: string,
+//         index: number
+//     },
+//     name: string
+// }
 
 export interface ContractApiInterface {
     env: Environment

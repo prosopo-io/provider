@@ -18,7 +18,7 @@ import { Tasks } from '../../src/tasks/tasks'
 import { MockEnvironment } from '../mocks/mockenv'
 import { CaptchaMerkleTree } from '../../src/merkle'
 import {
-    PROVIDER,
+    GET_PROVIDER,
     DAPP_USER,
     DAPP,
     TestProvider,
@@ -26,7 +26,8 @@ import {
 } from '../mocks/accounts'
 import { ERRORS } from '../../src/errors'
 import { SOLVED_CAPTCHAS, DATASET } from '../mocks/mockdb'
-import { CaptchaSolution, Payee, Provider } from '../../src/types'
+import { CaptchaSolution } from '../../src/types'
+import { Payee, Provider } from '../../src/interfaces'
 import {
     computeCaptchaSolutionHash,
     computePendingRequestHash
@@ -35,7 +36,6 @@ import { sendFunds, setupDapp, setupProvider } from '../mocks/setup'
 import { randomAsHex } from '@polkadot/util-crypto'
 import { AnyJson } from '@polkadot/types/types/codec'
 import { promiseQueue } from '../../src/util'
-import { BN } from '@polkadot/util'
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
@@ -54,6 +54,8 @@ describe('CONTRACT TASKS', () => {
         try {
             // Register the dapp
             await mockEnv.isReady()
+
+            const PROVIDER = GET_PROVIDER(mockEnv.network.registry)
 
             // Register a NEW provider otherwise commitments already exist in contract when Dapp User tries to use
             const [providerMnemonic, providerAddress] = mockEnv.createAccountAndAddToKeyring()
@@ -170,6 +172,7 @@ describe('CONTRACT TASKS', () => {
             'Provider',
             '10000000000000000000'
         )
+        const PROVIDER = GET_PROVIDER(mockEnv.network.registry)
         const inactiveProvider = { ...PROVIDER } as TestProvider
         inactiveProvider.mnemonic = providerMnemonic
         inactiveProvider.address = providerAddress
@@ -679,6 +682,7 @@ describe('CONTRACT TASKS', () => {
                         'Provider',
                         '10000000000000000000'
                     )
+                    const PROVIDER = GET_PROVIDER(mockEnv.network.registry)
                     const provider = { ...PROVIDER } as TestProvider
                     provider.mnemonic = providerMnemonic
                     provider.address = providerAddress
@@ -712,7 +716,7 @@ describe('CONTRACT TASKS', () => {
         })
 
         const res = await tasks.getRandomProvider(dappUser.address)
-        const blockNumber = parseInt(res.block_number.replace(/,/g, ''))
+        const blockNumber = res.block_number.toNumber()
         const valid = await tasks.validateProviderWasRandomlyChosen(dappUser.address, res.provider.captcha_dataset_id, blockNumber)
             .then(() => true).catch(() => false)
         return expect(valid).to.be.true
@@ -729,6 +733,7 @@ describe('CONTRACT TASKS', () => {
             'Provider',
             '10000000000000000000'
         )
+        const PROVIDER = GET_PROVIDER(mockEnv.network.registry)
         const provider = { ...PROVIDER } as TestProvider
         provider.mnemonic = providerMnemonic
         provider.address = providerAddress
@@ -755,7 +760,7 @@ describe('CONTRACT TASKS', () => {
         await tasks.providerAddDataset(captchaFilePath)
 
         const res = await tasks.getRandomProvider(dappUser.address)
-        const blockNumber = parseInt(res.block_number.replace(/,/g, ''))
+        const blockNumber = res.block_number.toNumber()
         const valid = await tasks.validateProviderWasRandomlyChosen(dappUser.address, '0x1dc833d14a257f21967feddafb3b3876b75b3fc9b0a2d071f29da9bfebc84f5a', blockNumber).then(() => true).catch(() => false)
         return expect(valid).to.be.false
     })

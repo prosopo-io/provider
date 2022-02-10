@@ -13,7 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with provider.  If not, see <http://www.gnu.org/licenses/>.
-import { Payee } from '../../src/types'
+import { Registry } from 'redspot/types'
+import { Payee } from '../../src/interfaces'
+import { initPayee } from '../../src/interfaces/prosopo/util'
 
 export interface TestAccount {
     mnemonic: string
@@ -29,16 +31,16 @@ export interface TestProvider extends TestAccount {
     captchaDatasetId: string,
 }
 
-export const PROVIDER: TestProvider = {
+export const GET_PROVIDER = (registry: Registry): TestProvider => ({
     serviceOrigin: 'http://localhost:8282',
     fee: 10,
-    payee: Payee.Provider,
+    payee: initPayee(registry, 'Provider'),
     stake: 10,
     datasetFile: '/usr/src/data/captchas.json',
     captchaDatasetId: '',
     mnemonic: '',
     address: ''
-}
+})
 
 export interface TestDapp {
     serviceOrigin: string,

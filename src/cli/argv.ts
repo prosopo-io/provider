@@ -18,21 +18,13 @@ import { Compact, u128 } from '@polkadot/types'
 import { encodeStringAddress } from '../util'
 import { ERRORS } from '../errors'
 import { Tasks } from '../tasks/tasks'
-import { Payee, PayeeSchema, ProsopoEnvironment } from '../types'
+import { ProsopoEnvironment } from '../types'
+import { Payee } from '../interfaces'
+import { initPayee, PayeeType } from '../interfaces/prosopo/util'
 
 const validateAddress = (argv) => {
     const address = encodeStringAddress(argv.address as string)
     return { address }
-}
-
-const validatePayee = (argv) => {
-    try {
-        const payeeArg: string = argv.payee[0].toUpperCase() + argv.payee.slice(1).toLowerCase() || ''
-        const payee = PayeeSchema.parse(payeeArg)
-        return { payee }
-    } catch (error) {
-        throw new Error(`${ERRORS.CLI.PARAMETER_ERROR.message}::value::${argv.payee}`)
-    }
 }
 
 const validateValue = (argv) => {
@@ -45,6 +37,17 @@ const validateValue = (argv) => {
 
 export function processArgs (args, env: ProsopoEnvironment) {
     const tasks = new Tasks(env)
+
+    const validatePayee = (argv) => {
+        try {
+            const payeeArg: string = argv.payee[0].toUpperCase() + argv.payee.slice(1).toLowerCase() || ''
+            const payee = initPayee(env.network.registry, payeeArg as PayeeType)
+            return { payee }
+        } catch (error) {
+            throw new Error(`${ERRORS.CLI.PARAMETER_ERROR.message}::value::${argv.payee}`)
+        }
+    }
+
     return yargs
         .usage('Usage: $0 [global options] <command> [options]')
         .option('api', { demand: false, default: false, type: 'boolean' })
