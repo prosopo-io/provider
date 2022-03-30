@@ -788,14 +788,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/wasm-crypto-wasm@npm:^4.5.1":
-  version: 4.6.1
-  resolution: "@polkadot/wasm-crypto-wasm@npm:4.6.1"
+"@polkadot/wasm-crypto-wasm@npm:4.5.1":
+  version: 4.5.1
+  resolution: "@polkadot/wasm-crypto-wasm@npm:4.5.1"
   dependencies:
-    "@babel/runtime": ^7.17.2
-  peerDependencies:
-    "@polkadot/util": "*"
-  checksum: 5b896a8c0fc025e8999689f89bea4c8437228f37ed8bb267749b1786e4b5c40c80b321d8bdc45fd3f69bfc64a74c015db023454ee574f18b4b82fcb4aea76f38
+    "@babel/runtime": ^7.16.3
+  checksum: b44833a47f87af19b8724d310e64a10c8a3a4499d6af247d48e76dfe0dbbf5c40a21681dbb97297f1ea31a0d66518093ed14509ace16087293cf93e97b28ee73
   languageName: node
   linkType: hard
 
@@ -5074,7 +5072,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-gyp@npm:latest":
+"node-gyp@npm:^9.0.0, node-gyp@npm:latest":
   version: 9.0.0
   resolution: "node-gyp@npm:9.0.0"
   dependencies:
@@ -5518,6 +5516,7 @@ __metadata:
     express: ^4.17.1
     mocha: 8.4.0
     mongodb: ^4.1.4
+    node-gyp: ^9.0.0
     redspot: "file:../redspot/build/redspot-core"
     ts-node: ^10.0.0
     typescript: ^4.5.4
