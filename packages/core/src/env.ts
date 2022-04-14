@@ -47,7 +47,7 @@ export class Environment implements ProsopoEnvironment {
 
     abi: ContractAbi
 
-    network!: Network
+    network: Promise<Network>
 
     logger: typeof consola
 
@@ -61,14 +61,14 @@ export class Environment implements ProsopoEnvironment {
             this.contractName = this.config.networks![this.defaultEnvironment].contract.name
             this.abi = Environment.getContractAbi(this.config.contract.abi) as ContractAbi
             this.logger = consola.create({level: this.config.logLevel as unknown as LogLevel});
+            this.network = createNetwork(this.mnemonic, this.config.networks[this.defaultEnvironment])
         } else {
             throw new Error(`${ERRORS.CONFIG.UNKNOWN_ENVIRONMENT}:${this.config.defaultEnvironment}`)
         }
     }
 
     async isReady() {
-        this.network = await createNetwork(this.mnemonic, this.config.networks![this.defaultEnvironment])
-        this.contractInterface = new ProsopoContractApi(this.deployerAddress, this.contractAddress, this.mnemonic, this.contractName, this.abi, this.network)
+        this.contractInterface = new ProsopoContractApi(this.contractAddress, this.mnemonic, this.abi, this.network)
         await this.importDatabase()
         await this.db?.connect()
         await this.contractInterface?.isReady()

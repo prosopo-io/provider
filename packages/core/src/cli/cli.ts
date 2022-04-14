@@ -40,7 +40,7 @@ async function main () {
 
   await env.isReady();
   const args = await processArgs(process.argv.slice(2), env);
-
+  console.log(args);
   if (args.api) {
     app.use(prosopoMiddleware(env));
     app.use(handleErrors);

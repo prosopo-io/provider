@@ -11,8 +11,9 @@ export interface Network {
     api: ApiPromise
     registry: Registry
     keyring: KeyringInstance,
-    keyringPair: KeyringPair
+    keyringPair?: KeyringPair
     signer: Signer
+    getAddresses: () => string[]
 }
 
 export interface NetworkUserConfig {

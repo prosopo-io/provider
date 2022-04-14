@@ -50,8 +50,8 @@ describe('CONTRACT TASKS', () => {
     await mockEnv.isReady();
 
     // Register a NEW provider otherwise commitments already exist in contract when Dapp User tries to use
-    const [providerMnemonic, providerAddress] = mockEnv.contractInterface!.createAccountAndAddToKeyring() || [];
-
+    const [providerMnemonic, providerAddress] = await mockEnv.contractInterface!.createAccountAndAddToKeyring() || [];
+    console.log(providerMnemonic, providerAddress)
     await mockEnv.contractInterface!.changeSigner('//Alice');
     await sendFunds(
       mockEnv,
@@ -65,7 +65,7 @@ describe('CONTRACT TASKS', () => {
     // Service origins cannot be duplicated
     provider.serviceOrigin = provider.serviceOrigin + randomAsHex().slice(0, 8);
     datasetId = await setupProvider(mockEnv, provider as TestProvider);
-    const [dappMnemonic, dappAddress] = mockEnv.contractInterface!.createAccountAndAddToKeyring() || [];
+    const [dappMnemonic, dappAddress] = await mockEnv.contractInterface!.createAccountAndAddToKeyring() || [];
 
     dapp = { ...DAPP } as TestDapp;
     await sendFunds(mockEnv, dappAddress, 'Dapp', '1000000000000000000');
@@ -122,7 +122,7 @@ describe('CONTRACT TASKS', () => {
   }
 
   it('Provider registration', async () => {
-    const [providerMnemonic, providerAddress] = mockEnv.contractInterface!.createAccountAndAddToKeyring() || ['', ''];
+    const [providerMnemonic, providerAddress] = await mockEnv.contractInterface!.createAccountAndAddToKeyring() || ['', ''];
 
     await sendFunds(
       mockEnv,
@@ -181,7 +181,7 @@ describe('CONTRACT TASKS', () => {
   });
 
   it('Inactive Provider cannot add dataset', async () => {
-    const [providerMnemonic, providerAddress] = mockEnv.contractInterface!.createAccountAndAddToKeyring() || [];
+    const [providerMnemonic, providerAddress] = await mockEnv.contractInterface!.createAccountAndAddToKeyring() || [];
 
     await mockEnv.contractInterface!.changeSigner('//Alice');
     await sendFunds(
@@ -764,7 +764,7 @@ describe('CONTRACT TASKS', () => {
     const queueRes = await promiseQueue(
       new Array(4).fill(0).map(
         (_, datasetIndex) => async () => {
-          const [providerMnemonic, providerAddress] = mockEnv.contractInterface!.createAccountAndAddToKeyring() || ['', ''];
+          const [providerMnemonic, providerAddress] = await mockEnv.contractInterface!.createAccountAndAddToKeyring() || ['', ''];
 
           await mockEnv.contractInterface!.changeSigner('//Alice');
           await sendFunds(
@@ -820,7 +820,7 @@ describe('CONTRACT TASKS', () => {
   it('Validate provided captcha dataset - fail', async () => {
     const tasks = new Tasks(mockEnv);
     const [providerMnemonic, providerAddress] =
-        mockEnv.contractInterface!.createAccountAndAddToKeyring() || ['', ''];
+        await mockEnv.contractInterface!.createAccountAndAddToKeyring() || ['', ''];
 
     await mockEnv.contractInterface!.changeSigner('//Alice');
     await sendFunds(

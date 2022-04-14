@@ -71,3 +71,7 @@ export interface PopulatedTransaction extends Partial<SignerOptions> {
 export type ContractFunction<T = any> = (
     ...args: TransactionParams
 ) => Promise<T>;
+
+export interface ContractInterfaceConfig {
+
+}

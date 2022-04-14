@@ -28,26 +28,22 @@ const {mnemonicGenerate} = require('@polkadot/util-crypto')
 
 export class ProsopoContractApi implements ContractApiInterface {
     contract?: Contract
-    network!: Network
-    mnemonic: string
+    network: Promise<Network>
+    mnemonic: string | undefined
     signer!: Signer
-    deployerAddress: string
     contractAddress: string
-    contractName: string
     abi: ContractAbi
 
-    constructor(deployerAddress: string, contractAddress: string, mnemonic: string, contractName: string, abi: ContractAbi, network: Network) {
-        this.deployerAddress = deployerAddress
+    constructor(contractAddress: string, mnemonic: string | undefined, abi: ContractAbi, network: Promise<Network>) {
         this.mnemonic = mnemonic
-        this.contractName = contractName
         this.contractAddress = contractAddress
         this.abi = abi
         this.network = network
     }
 
     async isReady(): Promise<void> {
-        await this.network.api.isReadyOrError
-        await this.network.registry.register(contractDefinitions)
+        const network = await this.network;
+        await network.registry.register(contractDefinitions)
         await this.getSigner()
         await this.getContract()
         if (this.contract === undefined) {
@@ -56,13 +52,13 @@ export class ProsopoContractApi implements ContractApiInterface {
     }
 
     async getSigner(): Promise<Signer> {
-        await this.network.api.isReadyOrError
+        const network = await this.network;
         const {mnemonic} = this
         if (!mnemonic) {
             throw new Error(ERRORS.CONTRACT.SIGNER_UNDEFINED.message)
         }
-        const keyringPair = this.network.keyring.addFromMnemonic(mnemonic)
-        const accountSigner = this.network.signer
+        const keyringPair = network.keyring.addFromMnemonic(mnemonic)
+        const accountSigner = network.signer
         const signer = new Signer(keyringPair, accountSigner)
         accountSigner.addPair(signer.pair)
         this.signer = signer
@@ -71,25 +67,24 @@ export class ProsopoContractApi implements ContractApiInterface {
     }
 
     async changeSigner(mnemonic: string): Promise<Signer> {
-        await this.network.api.isReadyOrError
         this.mnemonic = mnemonic
         return await this.getSigner()
     }
 
     async getContract(): Promise<Contract> {
-        await this.network.api.isReadyOrError
-        let contract = new Contract(this.contractAddress, this.abi, this.network.api, this.signer)
+        const network = await this.network;
+        let contract = new Contract(this.contractAddress, this.abi, network.api, this.signer)
         if (!contract) {
             throw new Error(ERRORS.CONTRACT.CONTRACT_UNDEFINED.message)
         }
-
         this.contract = contract
         return contract
     }
 
-    createAccountAndAddToKeyring(): [string, string] {
+    async createAccountAndAddToKeyring(): Promise<[string, string]> {
+        const network = await this.network;
         const mnemonic: string = mnemonicGenerate()
-        const account = this.network.keyring.addFromMnemonic(mnemonic)
+        const account = network.keyring.addFromMnemonic(mnemonic)
         const {address} = account
         return [mnemonic, address]
     }
@@ -205,13 +200,14 @@ export class ProsopoContractApi implements ContractApiInterface {
      * @return {any} data
      */
     async getStorage<T>(name: string, decodingFn: (registry: Registry, data: Uint8Array) => T): Promise<T> {
+        const network = await this.network;
         await this.getContract()
         const storageKey = this.getStorageKey(name)
         if (!this.contract) {
             throw new Error(ERRORS.CONTRACT.CONTRACT_UNDEFINED.message)
         }
-        const promiseResult = await this.network.api.rpc.contracts.getStorage(this.contract.address, storageKey)
+        const promiseResult = await network.api.rpc.contracts.getStorage(this.contract.address, storageKey)
         const data = promiseResult.unwrapOrDefault()
-        return decodingFn(this.network.registry, data)
+        return decodingFn(network.registry, data)
     }
 }

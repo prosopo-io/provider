@@ -27,7 +27,7 @@ export interface ProsopoEnvironment {
     contractAddress: string
     defaultEnvironment: string
     contractName: string
-    network: Network,
+    network: Promise<Network>,
     logger: typeof consola
     isReady (): Promise<void>
     importDatabase (): Promise<void>

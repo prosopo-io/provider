@@ -22,6 +22,7 @@ import {Hash} from '@polkadot/types/interfaces'
 import {TestAccount, TestDapp, TestProvider} from './accounts'
 import {getEventsFromMethodName} from '@prosopo/contract';
 import {buildTx} from '@prosopo/contract'
+import {ProsopoEnvironment} from "@prosopo/provider-core/types";
 
 export async function displayBalance(env, address, who) {
     const logger = env.logger;
@@ -30,26 +31,28 @@ export async function displayBalance(env, address, who) {
     return balance
 }
 
-export async function sendFunds(env, address, who, amount): Promise<void> {
-    await env.contractInterface.network.api.isReady
-    const balance = await env.contractInterface.network.api.query.system.account(address)
-    const signerAddresses: string[] = await env.contractInterface.network.getAddresses()
+export async function sendFunds(env: ProsopoEnvironment, address: string, who: string, amount: number | bigint | string): Promise<void> {
+    const network = await env.network;
+    const signerAddresses: string[] = network.getAddresses()
     const Alice = signerAddresses[0]
-    const alicePair = env.contractInterface.network.keyring.getPair(Alice)
-    const AliceBalance = await env.contractInterface.network.api.query.system.account(alicePair.address)
+    const alicePair = network.keyring.getPair(Alice)
+    console.log("Alice address", alicePair.address)
+    const AliceBalance = await network.api.query.system.account(alicePair.address)
     if (AliceBalance < amount) {
         throw new Error(`Alice balance too low: , ${AliceBalance}`)
     }
-    const api = env.contractInterface.network.api
+
+    const api = network.api
     await buildTx(
         api.registry,
         api.tx.balances.transfer(address, amount),
         alicePair.address, // from,
-        {signer: env.network.signer}
+        {signer: network.signer}
     )
 }
 
-export async function setupProvider(env, provider: TestProvider): Promise<Hash> {
+export async function setupProvider(env: ProsopoEnvironment, provider: TestProvider): Promise<Hash> {
+    await env.isReady();
     await env.contractInterface.changeSigner(provider.mnemonic)
     const logger = env.logger;
     const tasks = new Tasks(env)
@@ -64,7 +67,7 @@ export async function setupProvider(env, provider: TestProvider): Promise<Hash> 
     return events[0].args[1] as Hash
 }
 
-export async function setupDapp(env, dapp: TestDapp): Promise<void> {
+export async function setupDapp(env: ProsopoEnvironment, dapp: TestDapp): Promise<void> {
     const tasks = new Tasks(env)
     const logger = env.logger;
     await env.contractInterface.changeSigner(dapp.mnemonic)
@@ -74,7 +77,12 @@ export async function setupDapp(env, dapp: TestDapp): Promise<void> {
     await tasks.dappFund(dapp.contractAccount, dapp.fundAmount)
 }
 
-export async function setupDappUser(env, dappUser: TestAccount, provider: TestProvider, dapp: TestDapp): Promise<string | undefined> {
+export async function setupDappUser(
+    env: ProsopoEnvironment,
+    dappUser: TestAccount,
+    provider: TestProvider,
+    dapp: TestDapp
+): Promise<string | undefined> {
     await env.contractInterface.changeSigner(dappUser.mnemonic)
 
     // This section is doing everything that the ProCaptcha repo will eventually be doing in the client browser
@@ -122,7 +130,12 @@ export async function setupDappUser(env, dappUser: TestAccount, provider: TestPr
     }
 }
 
-export async function approveOrDisapproveCommitment(env, solutionHash: string, approve: boolean, provider: TestProvider) {
+export async function approveOrDisapproveCommitment(
+    env: ProsopoEnvironment,
+    solutionHash: string,
+    approve: boolean,
+    provider: TestProvider
+) {
     const tasks = new Tasks(env)
     const logger = env.logger;
     // This stage would take place on the Provider node after checking the solution was correct

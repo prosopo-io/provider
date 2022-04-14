@@ -126,6 +126,4 @@ async function processArgs (env) {
   });
 }
 
-run().catch((err) => {
-  throw new Error(`Setup dev error: ${err}`);
-});
+run()

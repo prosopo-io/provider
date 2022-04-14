@@ -32,7 +32,7 @@ export class MockEnvironment implements ProsopoEnvironment {
     contractName: string
     contractInterface: ContractApiInterface | undefined
     abi: ContractAbi
-    network!: Network
+    network: Promise<Network>
     logger: typeof consola
 
     constructor() {
@@ -87,6 +87,7 @@ export class MockEnvironment implements ProsopoEnvironment {
             this.contractName = this.config.networks[this.defaultEnvironment].contract.name
             this.abi = MockEnvironment.getContractAbi(this.config.contract.abi)
             this.logger = consola.create({level: this.config.logLevel as unknown as LogLevel});
+            this.network = createNetwork(this.mnemonic, this.config.networks![this.defaultEnvironment])
         } else {
             throw new Error(`${ERRORS.CONFIG.UNKNOWN_ENVIRONMENT.message}:${this.config.defaultEnvironment}`)
         }
@@ -94,8 +95,7 @@ export class MockEnvironment implements ProsopoEnvironment {
 
 
     async isReady(): Promise<void> {
-        this.network = await createNetwork(this.mnemonic, this.config.networks![this.defaultEnvironment])
-        this.contractInterface = new ProsopoContractApi(this.deployerAddress, this.contractAddress, this.mnemonic, this.contractName, this.abi, this.network)
+        this.contractInterface = new ProsopoContractApi(this.contractAddress, this.mnemonic, this.abi, this.network)
         // Persist database state for tests
         if (!this.db) {
             await this.importDatabase()

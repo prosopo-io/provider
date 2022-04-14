@@ -30,10 +30,9 @@ export interface ContractApiInterface {
     contract?: Contract
     mnemonic?: string
     signer: Signer
-    deployerAddress: string
     contractAddress: AccountId | string
     abi: ContractAbi
-    network: Network
+    network: Promise<Network>
 
     isReady(): Promise<void>
 
@@ -43,7 +42,7 @@ export interface ContractApiInterface {
 
     changeSigner(mnemonic: string): Promise<Signer>
 
-    createAccountAndAddToKeyring(): [string, string]
+    createAccountAndAddToKeyring(): Promise<[string, string]>
 
     beforeCall<T>(contractMethodName: string, args: T[]): Promise<{ encodedArgs: T[]; signedContract: Contract }>
 

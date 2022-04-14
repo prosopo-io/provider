@@ -68,7 +68,7 @@ const validateScheduleExpression = (argv) => {
   }
 };
 
-export function processArgs (args, env: ProsopoEnvironment) {
+export async function processArgs (args, env: ProsopoEnvironment) {
   const tasks = new Tasks(env);
   const logger = env.logger;
   return yargs

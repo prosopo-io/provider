@@ -71,12 +71,13 @@ export class Tasks {
 
     captchaSolutionConfig: CaptchaSolutionConfig
 
+    env: ProsopoEnvironment
+
     constructor(env: ProsopoEnvironment) {
-        // this.contractApi = new ProsopoContractApi(env.deployerAddress, env.contractAddress, env.mnemonic, env.contractName)
         if (!env.contractInterface) {
             throw new Error(ERRORS.CONTRACT.CONTRACT_UNDEFINED.message);
         }
-
+        this.env = env;
         this.contractApi = env.contractInterface!;
         this.db = env.db as Database;
         this.captchaConfig = env.config.captchas;
@@ -453,7 +454,8 @@ export class Tasks {
      */
     private async getPaymentInfo(userAccount: string, blockHash: string, txHash: string): Promise<RuntimeDispatchInfo | null> {
         // Validate block and transaction, checking that the signer matches the userAccount
-        const signedBlock = await this.contractApi.network.api.rpc.chain.getBlock(blockHash)
+        const network = await this.env.network;
+        const signedBlock = await network.api.rpc.chain.getBlock(blockHash)
         if (!signedBlock) {
             return null
         }
@@ -462,7 +464,7 @@ export class Tasks {
             return null
         }
         // Retrieve tx fee for extrinsic
-        const paymentInfo = await this.contractApi.network.api.rpc.payment.queryInfo(extrinsic.toHex(), blockHash)
+        const paymentInfo = await network.api.rpc.payment.queryInfo(extrinsic.toHex(), blockHash)
         if (!paymentInfo) {
             return null
         }
