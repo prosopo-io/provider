@@ -20,27 +20,27 @@ import {CaptchaMerkleTree} from '../../src/merkle'
 import {computeCaptchaSolutionHash, convertCaptchaToCaptchaSolution} from '../../src/captcha'
 import {Hash} from '@polkadot/types/interfaces'
 import {TestAccount, TestDapp, TestProvider} from './accounts'
-import {getEventsFromMethodName} from '@prosopo/contract';
+import {BigNumber, getEventsFromMethodName} from '@prosopo/contract';
 import {buildTx} from '@prosopo/contract'
 import {ProsopoEnvironment} from "@prosopo/provider-core/types";
 
 export async function displayBalance(env, address, who) {
     const logger = env.logger;
-    const balance = await env.contractInterface.network.api.query.system.account(address)
+    const balance = await env.contractInterface?.network.api.query.system.account(address)
     logger.info(who, ' Balance: ', balance.data.free.toHuman())
     return balance
 }
 
-export async function sendFunds(env: ProsopoEnvironment, address: string, who: string, amount: number | bigint | string): Promise<void> {
+export async function sendFunds(env: ProsopoEnvironment, address: string, who: string, amount: BigNumber): Promise<void> {
     const network = await env.network;
-    const signerAddresses: string[] = network.getAddresses()
+    const signerAddresses: string[] = await network.getAddresses()
     const Alice = signerAddresses[0]
     const alicePair = network.keyring.getPair(Alice)
     console.log("Alice address", alicePair.address)
     const AliceBalance = await network.api.query.system.account(alicePair.address)
-    if (AliceBalance < amount) {
-        throw new Error(`Alice balance too low: , ${AliceBalance}`)
-    }
+    // if (AliceBalance < amount) {
+    //     throw new Error(`Alice balance too low: , ${AliceBalance}`)
+    // }
 
     const api = network.api
     await buildTx(
@@ -53,7 +53,7 @@ export async function sendFunds(env: ProsopoEnvironment, address: string, who: s
 
 export async function setupProvider(env: ProsopoEnvironment, provider: TestProvider): Promise<Hash> {
     await env.isReady();
-    await env.contractInterface.changeSigner(provider.mnemonic)
+    await env.contractInterface?.changeSigner(provider.mnemonic)
     const logger = env.logger;
     const tasks = new Tasks(env)
     logger.info('   - providerRegister')
@@ -70,7 +70,7 @@ export async function setupProvider(env: ProsopoEnvironment, provider: TestProvi
 export async function setupDapp(env: ProsopoEnvironment, dapp: TestDapp): Promise<void> {
     const tasks = new Tasks(env)
     const logger = env.logger;
-    await env.contractInterface.changeSigner(dapp.mnemonic)
+    await env.contractInterface?.changeSigner(dapp.mnemonic)
     logger.info('   - dappRegister')
     await tasks.dappRegister(hexHash(dapp.serviceOrigin), dapp.contractAccount, blake2AsHex(decodeAddress(dapp.optionalOwner)))
     logger.info('   - dappFund')
@@ -83,7 +83,7 @@ export async function setupDappUser(
     provider: TestProvider,
     dapp: TestDapp
 ): Promise<string | undefined> {
-    await env.contractInterface.changeSigner(dappUser.mnemonic)
+    await env.contractInterface?.changeSigner(dappUser.mnemonic)
 
     // This section is doing everything that the ProCaptcha repo will eventually be doing in the client browser
     //   1. Get captcha JSON
@@ -106,7 +106,7 @@ export async function setupDappUser(
         const captchaSols = captchas.map(captcha => convertCaptchaToCaptchaSolution(captcha))
         const captchaSolHashes = captchaSols.map(computeCaptchaSolutionHash)
         tree.build(captchaSolHashes)
-        await env.contractInterface.changeSigner(dappUser.mnemonic)
+        await env.contractInterface?.changeSigner(dappUser.mnemonic)
         const captchaData = await tasks.getCaptchaData(providerOnChain.captcha_dataset_id.toString())
         if (captchaData.merkle_tree_root.toString() !== providerOnChain.captcha_dataset_id.toString()) {
             throw new Error(`Cannot find captcha data id: ${providerOnChain.captcha_dataset_id.toString()}`)
@@ -141,7 +141,7 @@ export async function approveOrDisapproveCommitment(
     // This stage would take place on the Provider node after checking the solution was correct
     // We need to assume that the Provider has access to the Dapp User's merkle tree root or can construct it from the
     // raw data that was sent to them
-    await env.contractInterface.changeSigner(provider.mnemonic)
+    await env.contractInterface?.changeSigner(provider.mnemonic)
     if (approve) {
         logger.info('   -   Approving commitment')
         await tasks.providerApprove(solutionHash, 100)

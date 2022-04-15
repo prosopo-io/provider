@@ -1,5 +1,4 @@
-import {WsProvider} from "@polkadot/rpc-provider/ws";
-import {ApiPromise} from "@polkadot/api";
+import {ApiPromise, WsProvider} from "@polkadot/api";
 import {Registry} from "@polkadot/types/types";
 import {KeyringInstance, KeyringPair} from "@polkadot/keyring/types";
 import {NetworkAccountsUserConfig} from "./signer";
@@ -13,7 +12,7 @@ export interface Network {
     keyring: KeyringInstance,
     keyringPair?: KeyringPair
     signer: Signer
-    getAddresses: () => string[]
+    getAddresses: () => Promise<string[]>
 }
 
 export interface NetworkUserConfig {

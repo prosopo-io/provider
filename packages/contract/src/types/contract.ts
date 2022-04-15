@@ -4,7 +4,7 @@ import {Codec, ISubmittableResult} from "@polkadot/types/types";
 import {AbiEvent} from "@polkadot/api-contract/types";
 import {SignerOptions, SubmittableExtrinsic} from "@polkadot/api/types";
 import {BigNumber} from "./index";
-
+import BN from 'bn.js'
 // Interfaces and types taken from @redspot/patract
 
 export interface TransactionResponse {
