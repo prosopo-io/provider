@@ -44,7 +44,9 @@ export class ProsopoContractApi implements ContractApiInterface {
     async isReady(): Promise<void> {
         const network = await this.network;
         await network.registry.register(contractDefinitions)
-        await this.getSigner()
+        if(this.mnemonic) {
+            await this.getSigner()
+        }
         await this.getContract()
         if (this.contract === undefined) {
             throw new Error(ERRORS.CONTRACT.CONTRACT_UNDEFINED.message)

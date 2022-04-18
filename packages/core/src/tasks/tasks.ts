@@ -22,7 +22,8 @@ import {
     Provider,
     CaptchaData,
     GovernanceStatus,
-    RandomProvider, BigNumber
+    RandomProvider,
+    BigNumber,
 } from '@prosopo/contract';
 import type {RuntimeDispatchInfo} from '@polkadot/types/interfaces/payment'
 import {Hash} from '@polkadot/types/interfaces';
@@ -122,7 +123,7 @@ export class Tasks {
         return await this.contractApi.contractTx('dappRegister', [dappServiceOrigin, dappContractAddress, dappOwner]);
     }
 
-    async dappFund(contractAccount: string, value: number | bigint | string): Promise<TransactionResponse> {
+    async dappFund(contractAccount: string, value: BigNumber): Promise<TransactionResponse> {
         return await this.contractApi.contractTx('dappFund', [contractAccount], value);
     }
 
