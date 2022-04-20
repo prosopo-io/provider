@@ -91,6 +91,8 @@ function processArgs (env) {
                 .option('approve', { type: 'boolean', demand: false })
                 .option('disapprove', { type: 'boolean', demand: false })
         }, async (argv) => {
+            const providerKeyringPair: KeyringPair = env.network.keyring.addFromMnemonic(PROVIDER.mnemonic)
+            PROVIDER.address = providerKeyringPair.address
             const solutionHash: string | undefined = await setupDappUser(env, DAPP_USER, PROVIDER, DAPP)
             if ((argv.approve || argv.disapprove) && solutionHash !== undefined) {
                 await approveOrDisapproveCommitment(env, solutionHash, argv.approve as boolean, PROVIDER)
